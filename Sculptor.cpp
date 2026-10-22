@@ -50,15 +50,19 @@ void Sculptor::setColor(float r, float g, float b, float alpha){
 }
 
 void Sculptor::putVoxel(int x, int y, int z){
+    if(!(x>=nx || y>=ny || z>=nz)){
     v[x][y][z].r = r;
     v[x][y][z].g = g;
     v[x][y][z].b = b;
     v[x][y][z].a = a;
     v[x][y][z].show = true;
 }
+}
 
 void Sculptor::cutVoxel(int x, int y, int z){
+    if(!(x>=nx || y>=ny || z>=nz)){
     v[x][y][z].show = false;
+}
 }
 
 void Sculptor::putBox(int x0, int x1, int y0, int y1, int z0, int z1){
