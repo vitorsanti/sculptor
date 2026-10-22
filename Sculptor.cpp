@@ -10,6 +10,10 @@ Sculptor::Sculptor(int _nx, int _ny, int _nz){
     nx = _nx;
     ny = _ny;
     nz = _nz;
+    r = 0;
+    g = 0;
+    b = 0;
+    a = 1;
     v = new Voxel**[nx];
     v[0] = new Voxel*[nx*ny];
     v[0][0] = new Voxel[nx*ny*nz];
@@ -50,7 +54,7 @@ void Sculptor::setColor(float r, float g, float b, float alpha){
 }
 
 void Sculptor::putVoxel(int x, int y, int z){
-    if(!(x>=nx || y>=ny || z>=nz)){
+    if(x >= 0 && x < nx && y >= 0 && y < ny && z >= 0 && z < nz){
     v[x][y][z].r = r;
     v[x][y][z].g = g;
     v[x][y][z].b = b;
@@ -60,7 +64,7 @@ void Sculptor::putVoxel(int x, int y, int z){
 }
 
 void Sculptor::cutVoxel(int x, int y, int z){
-    if(!(x>=nx || y>=ny || z>=nz)){
+    if(x >= 0 && x < nx && y >= 0 && y < ny && z >= 0 && z < nz){
     v[x][y][z].show = false;
 }
 }
@@ -151,12 +155,11 @@ void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
     int y1 = std::min(ny - 1, ycenter + ry);
     int z0 = std::max(0,     zcenter - rz);
     int z1 = std::min(nz - 1, zcenter + rz);
-    int radius = sqrt(pow(rx,2) + pow(ry,2) + pow(rz,2));
 
     for(int i=x0; i<=x1; i++){
         for (int j=y0; j<=y1; j++){
             for (int k=z0; k<=z1; k++){
-                if (sqrt(pow(i-xcenter, 2) + pow(j-ycenter, 2) + pow(k-zcenter, 2)) <= radius){
+                if ((pow(i-xcenter,2)/pow(rx,2) + pow(j-ycenter,2)/pow(ry,2) + pow(k-zcenter,2)/pow(rz,2)) <= 1){
                     v[i][j][k].r = Sculptor::r;
                     v[i][j][k].g = Sculptor::g;
                     v[i][j][k].b = Sculptor::b;
@@ -175,12 +178,11 @@ void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
     int y1 = std::min(ny - 1, ycenter + ry);
     int z0 = std::max(0,     zcenter - rz);
     int z1 = std::min(nz - 1, zcenter + rz);
-    int radius = sqrt(pow(rx,2) + pow(ry,2) + pow(rz,2));
 
     for(int i=x0; i<=x1; i++){
         for (int j=y0; j<=y1; j++){
             for (int k=z0; k<=z1; k++){
-                if (sqrt(pow(i-xcenter, 2) + pow(j-ycenter, 2) + pow(k-zcenter, 2)) <= radius){
+                if ((pow(i-xcenter,2)/pow(rx,2) + pow(j-ycenter,2)/pow(ry,2) + pow(k-zcenter,2)/pow(rz,2)) <= 1){
                     v[i][j][k].show = false;
                 }
             }
