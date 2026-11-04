@@ -1,4 +1,4 @@
-#include "Sculptor.h"
+#include "sculptor.h"
 #include <math.h>
 #include <fstream>
 #include <string>
@@ -11,6 +11,11 @@ Sculptor::Sculptor(int _nx, int _ny, int _nz){
     nx = _nx;
     ny = _ny;
     nz = _nz;
+
+    if (nx <= 0 || ny <= 0 || nz <= 0) {
+        exit(1);
+    }
+
     r = 0;
     g = 0;
     b = 0;
@@ -39,7 +44,7 @@ Sculptor::Sculptor(int _nx, int _ny, int _nz){
             }
         }
     }
-    }
+}
 
 Sculptor::~Sculptor(){
     delete[] v[0][0];
@@ -56,27 +61,28 @@ void Sculptor::setColor(float r, float g, float b, float alpha){
 
 void Sculptor::putVoxel(int x, int y, int z){
     if(x >= 0 && x < nx && y >= 0 && y < ny && z >= 0 && z < nz){
-    v[x][y][z].r = r;
-    v[x][y][z].g = g;
-    v[x][y][z].b = b;
-    v[x][y][z].a = a;
-    v[x][y][z].show = true;
-}
+        v[x][y][z].r = r;
+        v[x][y][z].g = g;
+        v[x][y][z].b = b;
+        v[x][y][z].a = a;
+        v[x][y][z].show = true;
+    }
 }
 
 void Sculptor::cutVoxel(int x, int y, int z){
     if(x >= 0 && x < nx && y >= 0 && y < ny && z >= 0 && z < nz){
-    v[x][y][z].show = false;
-}
+        v[x][y][z].show = false;
+    }
 }
 
 void Sculptor::putBox(int x0, int x1, int y0, int y1, int z0, int z1){
-    int _x0 = std::max(0, x0);
-    int _x1 = std::min(nx - 1, x1);
-    int _y0 = std::max(0, y0);
-    int _y1 = std::min(ny - 1, y1);
-    int _z0 = std::max(0, z0);
-    int _z1 = std::min(nz - 1, z1);
+    int _x0 = std::max(0, std::min(x0, x1));
+    int _x1 = std::min(nx - 1, std::max(x1, x0));
+    int _y0 = std::max(0, std::min(y0, y1));
+    int _y1 = std::min(ny - 1, std::max(y1, y0));
+    int _z0 = std::max(0, std::min(z0, z1));
+    int _z1 = std::min(nz - 1, std::max(z1, z0));
+
     for (int i=_x0; i<=_x1; i++){
         for (int j=_y0; j<=_y1; j++){
             for (int k=_z0; k<=_z1; k++){
@@ -91,12 +97,13 @@ void Sculptor::putBox(int x0, int x1, int y0, int y1, int z0, int z1){
 }
 
 void Sculptor::cutBox(int x0, int x1, int y0, int y1, int z0, int z1){
-    int _x0 = std::max(0, x0);
-    int _x1 = std::min(nx - 1, x1);
-    int _y0 = std::max(0, y0);
-    int _y1 = std::min(ny - 1, y1);
-    int _z0 = std::max(0, z0);
-    int _z1 = std::min(nz - 1, z1);
+    int _x0 = std::max(0, std::min(x0, x1));
+    int _x1 = std::min(nx - 1, std::max(x1, x0));
+    int _y0 = std::max(0, std::min(y0, y1));
+    int _y1 = std::min(ny - 1, std::max(y1, y0));
+    int _z0 = std::max(0, std::min(z0, z1));
+    int _z1 = std::min(nz - 1, std::max(z1, z0));
+
     for (int i=_x0; i<=_x1; i++){
         for (int j=_y0; j<=_y1; j++){
             for (int k=_z0; k<=_z1; k++){
@@ -108,6 +115,11 @@ void Sculptor::cutBox(int x0, int x1, int y0, int y1, int z0, int z1){
 }
 
 void Sculptor::putSphere(int xcenter, int ycenter, int zcenter, int radius){
+
+    if (radius < 0) {
+        return;
+    }
+
     int x0 = std::max(0,     xcenter - radius);
     int x1 = std::min(nx - 1, xcenter + radius);
     int y0 = std::max(0,     ycenter - radius);
@@ -131,6 +143,11 @@ void Sculptor::putSphere(int xcenter, int ycenter, int zcenter, int radius){
 }
 
 void Sculptor::cutSphere(int xcenter, int ycenter, int zcenter, int radius){
+
+    if (radius < 0) {
+        return;
+    }
+
     int x0 = std::max(0,     xcenter - radius);
     int x1 = std::min(nx - 1, xcenter + radius);
     int y0 = std::max(0,     ycenter - radius);
@@ -150,12 +167,17 @@ void Sculptor::cutSphere(int xcenter, int ycenter, int zcenter, int radius){
 }
 
 void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int ry, int rz){
+
+    if (rx <= 0 || ry <= 0 || rz <= 0) {
+        return;
+    }
     int x0 = std::max(0,     xcenter - rx);
     int x1 = std::min(nx - 1, xcenter + rx);
     int y0 = std::max(0,     ycenter - ry);
     int y1 = std::min(ny - 1, ycenter + ry);
     int z0 = std::max(0,     zcenter - rz);
     int z1 = std::min(nz - 1, zcenter + rz);
+
 
     for(int i=x0; i<=x1; i++){
         for (int j=y0; j<=y1; j++){
@@ -173,6 +195,11 @@ void Sculptor::putEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int r
 }
 
 void Sculptor::cutEllipsoid(int xcenter, int ycenter, int zcenter, int rx, int ry, int rz){
+
+    if (rx <= 0 || ry <= 0 || rz <= 0) {
+        return;
+    }
+
     int x0 = std::max(0,     xcenter - rx);
     int x1 = std::min(nx - 1, xcenter + rx);
     int y0 = std::max(0,     ycenter - ry);
@@ -208,7 +235,7 @@ void Sculptor::writeOFF(const char* filename){
         for (int j=0; j<ny; j++){
             for (int k=0; k<nz; k++){
                 if(v[i][j][k].show == 1){
-                   voxels++;
+                    voxels++;
                 }
             }
         }
@@ -219,14 +246,14 @@ void Sculptor::writeOFF(const char* filename){
         for (int j=0; j<ny; j++){
             for (int k=0; k<nz; k++){
                 if(v[i][j][k].show == 1){
-                   fout << i-0.5 << " " << j+0.5 << " " << k-0.5 << "\n";
-                   fout << i-0.5 << " " << j-0.5 << " " << k-0.5 << "\n";
-                   fout << i+0.5 << " " << j-0.5 << " " << k-0.5 << "\n";
-                   fout << i+0.5 << " " << j+0.5 << " " << k-0.5 << "\n";
-                   fout << i-0.5 << " " << j+0.5 << " " << k+0.5 << "\n";
-                   fout << i-0.5 << " " << j-0.5 << " " << k+0.5 << "\n";
-                   fout << i+0.5 << " " << j-0.5 << " " << k+0.5 << "\n";
-                   fout << i+0.5 << " " << j+0.5 << " " << k+0.5 << "\n";
+                    fout << i-0.5 << " " << j+0.5 << " " << k-0.5 << "\n";
+                    fout << i-0.5 << " " << j-0.5 << " " << k-0.5 << "\n";
+                    fout << i+0.5 << " " << j-0.5 << " " << k-0.5 << "\n";
+                    fout << i+0.5 << " " << j+0.5 << " " << k-0.5 << "\n";
+                    fout << i-0.5 << " " << j+0.5 << " " << k+0.5 << "\n";
+                    fout << i-0.5 << " " << j-0.5 << " " << k+0.5 << "\n";
+                    fout << i+0.5 << " " << j-0.5 << " " << k+0.5 << "\n";
+                    fout << i+0.5 << " " << j+0.5 << " " << k+0.5 << "\n";
                 }
             }
         }
@@ -236,20 +263,20 @@ void Sculptor::writeOFF(const char* filename){
         for (int j=0; j<ny; j++){
             for (int k=0; k<nz; k++){
                 if(v[i][j][k].show == 1){
-                        fout << std::setprecision(2) << std::fixed;
+                    fout << std::setprecision(1) << std::fixed;
                     fout << "4 " << 0+(8*va) << " " << 3+(8*va) << " " << 2+(8*va) << " " << 1+(8*va) << " "
-                    << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << "\n";
+                         << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << "\n";
                     fout << "4 " << 4+(8*va) << " " << 5+(8*va) << " " << 6+(8*va) << " " << 7+(8*va) << " "
-                    << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << "\n";
+                         << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << "\n";
                     fout << "4 " << 0+(8*va) << " " << 1+(8*va) << " " << 5+(8*va) << " " << 4+(8*va) << " "
-                    << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << "\n";
+                         << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << "\n";
                     fout << "4 " << 0+(8*va) << " " << 4+(8*va) << " " << 7+(8*va) << " " << 3+(8*va) << " "
-                    << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << "\n";
+                         << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << "\n";
                     fout << "4 " << 3+(8*va) << " " << 7+(8*va) << " " << 6+(8*va) << " " << 2+(8*va) << " "
-                    << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << "\n";
+                         << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << "\n";
                     fout << "4 " << 1+(8*va) << " " << 2+(8*va) << " " << 6+(8*va) << " " << 5+(8*va) << " "
-                    << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << "\n";
-                   va++;
+                         << v[i][j][k].r << " " << v[i][j][k].g << " " << v[i][j][k].b << " " << v[i][j][k].a << "\n";
+                    va++;
                 }
             }
         }
